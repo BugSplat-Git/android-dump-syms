@@ -2,7 +2,7 @@
 import commandLineArgs from 'command-line-args';
 import commandLineUsage from 'command-line-usage';
 import { stat } from 'fs/promises';
-import path from 'path';
+import path, { basename } from 'path';
 import { AndroidDumpSymClient } from '../index';
 import { argDefinitions, usageDefinitions } from './command-line-definitions';
 import { writeFile } from './write-file';
@@ -42,7 +42,13 @@ dotenv.config();
     
     try {
         const host = process.env.BUGSPLAT_HOST || `https://${database}.bugsplat.com`;
+        
+        console.log(`Authenticating with BugSplat via ${host}...`);
+        
         const client = await AndroidDumpSymClient.create(clientId, clientSecret, host);
+
+        console.log(`About to upload ${file}...`);
+
         const response = await client.upload(file);
         const status = response.status;
 
@@ -54,7 +60,12 @@ dotenv.config();
         const fileName = path.basename(file, ext);
         const outputDir = path.dirname(file);
         const outputFile = path.join(outputDir, `${fileName}.sym`);
+
+        console.log(`Downloading ${basename(outputFile)}...`);
+        
         await writeFile(outputFile, response.body as ReadableStream);
+
+        console.log(`Successfully converted ${basename(file)} to ${basename(outputFile)}`);
     } catch (error) {
         console.error(error);
         returnCode = 1;
