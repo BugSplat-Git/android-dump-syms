@@ -52,7 +52,7 @@
     "typescript": "^4.3.2"
   },
   "dependencies": {
-    "@bugsplat/js-api-client": "^7.2.0",
+    "@bugsplat/js-api-client": "^7.3.0",
     "command-line-args": "^5.2.0",
     "command-line-usage": "^6.1.1"
   }
