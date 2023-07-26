@@ -6,6 +6,8 @@ import path from 'path';
 import { AndroidDumpSymClient } from '../index';
 import { argDefinitions, usageDefinitions } from './command-line-definitions';
 import { writeFile } from './write-file';
+import dotenv from 'dotenv';
+dotenv.config();
 
 (async () => {
     let {
@@ -39,7 +41,7 @@ import { writeFile } from './write-file';
     let returnCode = 0;
     
     try {
-        const host = process.env.BUGSPLAT_HOST;
+        const host = process.env.BUGSPLAT_HOST || `https://${database}.bugsplat.com`;
         const client = await AndroidDumpSymClient.create(clientId, clientSecret, host);
         const response = await client.upload(file);
         const status = response.status;
