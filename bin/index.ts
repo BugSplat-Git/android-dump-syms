@@ -2,10 +2,10 @@
 import commandLineArgs from 'command-line-args';
 import commandLineUsage from 'command-line-usage';
 import { stat } from 'fs/promises';
+import path from 'path';
 import { AndroidDumpSymClient } from '../index';
 import { argDefinitions, usageDefinitions } from './command-line-definitions';
 import { writeFile } from './write-file';
-import path from 'path';
 
 (async () => {
     let {
@@ -32,14 +32,7 @@ import path from 'path';
     if (!database) {
         logMissingArgAndExit('database');
     }
-    if (
-        !validAuthenticationArguments({
-            user,
-            password,
-            clientId,
-            clientSecret
-        })
-    ) {
+    if (!clientId || !clientSecret) {
         logMissingAuthAndExit();
     }
 
@@ -47,7 +40,7 @@ import path from 'path';
     
     try {
         const host = process.env.BUGSPLAT_HOST;
-        const client = user && password ? await AndroidDumpSymClient.createWithUsernameAndPassword(user, password, host) : await AndroidDumpSymClient.createWithOAuth(clientId, clientSecret, host);
+        const client = await AndroidDumpSymClient.create(clientId, clientSecret, host);
         const response = await client.upload(file);
         const status = response.status;
 
@@ -89,22 +82,6 @@ function logMissingArgAndExit(arg: string): void {
 }
 
 function logMissingAuthAndExit(): void {
-    console.log('\nInvalid authentication arguments: please provide either a user and password, or a clientId and clientSecret\n');
+    console.log('\nInvalid authentication arguments: please provide a clientId and clientSecret\n');
     process.exit(1);
-}
-
-function validAuthenticationArguments({
-    user,
-    password,
-    clientId,
-    clientSecret
-}: AuthenticationArgs): boolean {
-    return !!(user && password) || !!(clientId && clientSecret);
-}
-
-interface AuthenticationArgs {
-    user: string,
-    password: string,
-    clientId: string,
-    clientSecret: string
 }

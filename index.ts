@@ -20,13 +20,7 @@ export class AndroidDumpSymClient {
         });
     }
 
-    static async createWithUsernameAndPassword(user: string, password: string, host?: string | undefined): Promise<AndroidDumpSymClient> {
-        const client = await BugSplatApiClient.createAuthenticatedClientForNode(user, password, host);
-        
-        return new AndroidDumpSymClient(client);
-   }
-
-    static async createWithOAuth(clientId: string, clientSecret: string, host?: string | undefined): Promise<AndroidDumpSymClient> {
+    static async create(clientId: string, clientSecret: string, host?: string | undefined): Promise<AndroidDumpSymClient> {
         const client = await OAuthClientCredentialsClient.createAuthenticatedClient(clientId, clientSecret, host);
         
         return new AndroidDumpSymClient(client);
