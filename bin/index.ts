@@ -45,7 +45,7 @@ dotenv.config();
         
         console.log(`Authenticating with BugSplat via ${host}...`);
         
-        const client = await AndroidDumpSymsClient.create(clientId, clientSecret, host);
+        const client = await AndroidDumpSymsClient.create(database, clientId, clientSecret, host);
 
         console.log(`About to upload ${file}...`);
 

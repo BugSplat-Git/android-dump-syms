@@ -19,7 +19,8 @@ export class AndroidDumpSymsClient {
         });
     }
 
-    static async create(clientId: string, clientSecret: string, host?: string | undefined): Promise<AndroidDumpSymsClient> {
+    static async create(database: string, clientId: string, clientSecret: string, host?: string | undefined): Promise<AndroidDumpSymsClient> {
+        host = host ?? `https://${database}.bugsplat.com`;
         const client = await OAuthClientCredentialsClient.createAuthenticatedClient(clientId, clientSecret, host);
         
         return new AndroidDumpSymsClient(client);

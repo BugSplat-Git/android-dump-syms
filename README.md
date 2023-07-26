@@ -34,57 +34,52 @@ bobby@BugSplat % ~ % android-dump-syms -h
 ## API
 
 1. Install this package locally `npm i @bugsplat/android-dump-syms`.
-2. Import `BugSplatApiClient` and `VersionsApiClient` from @bugsplat/symbol-upload. Alternatively, you can import `OAuthClientCredentialsClient` if you'd prefer to authenticate with an [OAuth2 Client Credentials](https://docs.bugsplat.com/introduction/development/web-services/oauth2#client-credentials) Client ID and Client Secret.
+2. Import `AndroidDumpSymsClient` from @bugsplat/android-dump-syms.
 
 ```ts
-import { BugSplatApiClient, OAuthClientCredentialsClient, VersionsApiClient } from '@bugsplat/symbol-upload';
+import { AndroidDumpSymsClient } from '@bugsplat/android-dump-syms';
 ```
 
-3. Create a new instance of `BugSplatApiClient` using the `createAuthenticatedClientForNode` async factory function or `OAuthClientCredentialsClient` using the `createAuthenticatedClient` async factory function.
+3. Create a new instance of `AndroidDumpSymsClient` using the `create` async factory function.
 
 ```ts
-const bugsplat = await BugSplatApiClient.createAuthenticatedClientForNode(email, password);
+const client = await AndroidDumpSymsClient.create(database, clientId, clientSecret);
 ```
+
+4. Call `upload`, passing the function a path to an Android `.so` file.
 
 ```ts
-const bugsplat = await OAuthClientCredentialsClient.createAuthenticatedClient(clientId, clientSecret);
+const response = await client.upload('path/to/file.so');
 ```
 
-4. Create an `UploadableFile` object for each symbol file path.
+5. The `.sym` file can be streamed via the `body` property on the `response` object and written to a file.
 
 ```ts
-const files = paths.map(path => {
-  const stat = fs.statSync(path);
-  const size = stat.size;
-  const name = basename(path);
-  const file = fs.createReadStream(path);
-  return {
-          name,
-          size,
-          file
-  };
-});
+import { BugSplatResponse } from '@bugsplat/android-dump-syms';
+import { createWriteStream } from 'fs';
+import * as streamWeb from 'node:stream/web';
+import { Readable } from 'stream';
+import { finished } from 'stream/promises';
+
+export async function writeFile(path: string, response: BugSplatResponse): Promise<void> {
+    const readable = response.body as streamWeb.ReadableStream<any>;
+    const fileStream = createWriteStream(path, { flags: 'wx' });
+    await finished(Readable.fromWeb(readable).pipe(fileStream));
+}
 ```
 
-5. Create an instance of `VersionsApiClient` passing it an instance of `BugSplatApiClient`.
+If you've done everything correctly the resulting file will resemble the following:
 
-```ts
-const versionsApiClient = new VersionsApiClient(bugsplat);
 ```
-
-6. Await the call to `postSymbols` passing it the name of your BugSplat `database`, `application`, `version` and an array of `files`. These values need to match the values you used to initialize BugSplat on whichever [platform](https://docs.bugsplat.com/introduction/getting-started/integrations) you've integrated with.
-
-```ts
-await versionsApiClient.postSymbols(
-  database,
-  application,
-  version,
-  files
-);
+MODULE Linux arm64 9E957A33B0CDD8A32F80AD65D75601950 MyUnrealCrasher-arm64
+INFO CODE_ID 337A959ECDB0A3D82F80AD65D756019583483F98
+FILE 0 /Users/Shared/Epic Games/UE_5.2/Engine/Source/Runtime/Core/Public/Containers/ContainerAllocationPolicies.h
+FILE 1 /Users/Shared/Epic Games/UE_5.2/Engine/Source/Runtime/Core/Public/Delegates/DelegateInstancesImpl.h
+FILE 2 /Users/Shared/Epic Games/UE_5.2/Engine/Source/Runtime/Core/Public/Modules/ModuleManager.h
+FILE 3 /Users/Shared/Epic Games/UE_5.2/Engine/Source/Runtime/Core/Public/Templates/Function.h
+FILE 4 /Users/Shared/Epic Games/UE_5.2/Engine/Source/Runtime/CoreUObject/Public/UObject/Class.h
+FILE 5 /Users/Shared/Epic Games/UE_5.2/Engine/Source/Runtime/CoreUObject/Public/UObject/Object.h
+FILE 6 /Users/Shared/Epic Games/UE_5.2/Engine/Source/Runtime/CoreUObject/Public/UObject/UObjectBase.h
 ```
-
-If you've done everything correctly your symbols should now be shown on the [Versions](https://app.bugsplat.com/v2/versions) page.
-
-![Versions](https://bugsplat-public.s3.amazonaws.com/npm/symbol-upload/versions.png)
 
 Thanks for using BugSplat!
