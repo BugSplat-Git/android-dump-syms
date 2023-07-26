@@ -1,6 +1,6 @@
 {
   "name": "@bugsplat/android-dump-syms",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Cross platform symbol upload tool",
   "main": "./dist/index.js",
   "bin": {
