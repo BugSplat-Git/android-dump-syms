@@ -1,12 +1,12 @@
 #! /usr/bin/env node
 import commandLineArgs from 'command-line-args';
 import commandLineUsage from 'command-line-usage';
-import { stat } from 'fs/promises';
-import path, { basename } from 'path';
-import { AndroidDumpSymClient } from '../index';
-import { argDefinitions, usageDefinitions } from './command-line-definitions';
-import { writeFile } from './write-file';
 import dotenv from 'dotenv';
+import path, { basename } from 'path';
+import { AndroidDumpSymsClient } from '../index';
+import { argDefinitions, usageDefinitions } from './command-line-definitions';
+import { fileExists } from './exists';
+import { writeFile } from './write';
 dotenv.config();
 
 (async () => {
@@ -45,7 +45,7 @@ dotenv.config();
         
         console.log(`Authenticating with BugSplat via ${host}...`);
         
-        const client = await AndroidDumpSymClient.create(clientId, clientSecret, host);
+        const client = await AndroidDumpSymsClient.create(clientId, clientSecret, host);
 
         console.log(`About to upload ${file}...`);
 
@@ -74,14 +74,6 @@ dotenv.config();
     process.exit(returnCode);
 })();
 
-
-async function fileExists(path: string): Promise<boolean> {
-    try {
-        return !!(await stat(path));
-    } catch {
-        return false;
-    }
-}
 
 function logHelpAndExit() {
     const help = commandLineUsage(usageDefinitions);

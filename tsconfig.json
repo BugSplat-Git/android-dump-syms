@@ -13,6 +13,6 @@
   },
   "files": [
     "./index.ts",
-    "./bin/index.ts"
+    "./bin/index.ts",
   ]
 }
