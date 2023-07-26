@@ -1,4 +1,4 @@
-import { ApiClient, BugSplatApiClient, BugSplatResponse, OAuthClientCredentialsClient } from "@bugsplat/js-api-client";
+import { ApiClient, BugSplatResponse, OAuthClientCredentialsClient } from "@bugsplat/js-api-client";
 import { createReadStream } from "fs";
 import { readFile } from "fs/promises";
 import { basename } from "path";
