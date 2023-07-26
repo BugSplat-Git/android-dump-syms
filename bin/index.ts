@@ -56,8 +56,7 @@ dotenv.config();
             throw new Error(`Could not convert file, status: ${status}`)
         }
 
-        const ext = path.extname(file);
-        const fileName = path.basename(file, ext);
+        const fileName = path.basename(file);
         const outputDir = path.dirname(file);
         const outputFile = path.join(outputDir, `${fileName}.sym`);
 
