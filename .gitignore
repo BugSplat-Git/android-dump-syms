@@ -134,3 +134,6 @@ dist
 
 # Output sym file
 **/*.sym
+
+# pkg
+pkg
