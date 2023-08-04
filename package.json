@@ -10,7 +10,7 @@
     "dist"
   ],
   "scripts": {
-    "start": "ts-node -r dotenv/config ./bin/index.ts ./spec/support/MyUnrealCrasher-arm64.so",
+    "start": "ts-node -r dotenv/config ./bin/index.ts **/*.so -d ./spec",
     "test": "ts-node node_modules/jasmine/bin/jasmine",
     "help": "ts-node ./bin/index.ts -h",
     "clean": "rimraf ./dist",
@@ -42,6 +42,7 @@
   "devDependencies": {
     "@types/command-line-args": "^5.2.0",
     "@types/command-line-usage": "^5.0.2",
+    "@types/glob": "^8.1.0",
     "@types/jasmine": "^4.3.1",
     "@types/node": "^18.15.10",
     "jasmine": "^4.6.0",
@@ -54,6 +55,7 @@
     "@bugsplat/js-api-client": "^7.3.0",
     "command-line-args": "^5.2.0",
     "command-line-usage": "^6.1.1",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "glob": "^10.3.3"
   }
 }

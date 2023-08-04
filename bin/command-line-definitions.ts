@@ -5,10 +5,21 @@ export type CommandLineDefinition = ArgDefinition & UsageDefinition;
 
 export const argDefinitions: Array<CommandLineDefinition> = [
     {
-        name: 'file',
-        defaultOption: true,
+        name: 'files',
+        alias: 'f',
         type: String,
-        description: 'The file to convert'
+        defaultOption: true,
+        defaultValue: '**/*.sym',
+        typeLabel: '{underline string} (optional)',
+        description: 'Glob pattern that specifies a set of android binary files to upload. Defaults to \'**/*.so\'',
+    },
+    {
+        name: 'directory',
+        alias: 'd',
+        type: String,
+        defaultValue: '.',
+        typeLabel: '{underline string} (optional)',
+        description: 'Path of the base directory used to search for symbol files. This value will be combined with the --files glob. Defaults to \'.\'',
     },
     {
         name: 'help',
@@ -56,7 +67,7 @@ export const usageDefinitions: Array<Section> = [
     {
         header: 'Example',
         content: [
-            'android-dump-syms {italic path-to-binary-file} -d {italic your-bugsplat-database} -i {italic your-client-id} -s {italic your-client-secret}',
+            'android-dump-syms {italic glob-for-android-binary-files} -d {italic your-bugsplat-database} -i {italic your-client-id} -s {italic your-client-secret}',
         ]
     },
     {
