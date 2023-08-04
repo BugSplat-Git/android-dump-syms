@@ -2,16 +2,17 @@
 import commandLineArgs from 'command-line-args';
 import commandLineUsage from 'command-line-usage';
 import dotenv from 'dotenv';
-import path, { basename } from 'path';
+import { glob } from 'glob';
+import { basename, dirname, join } from 'path';
 import { AndroidDumpSymsClient } from '../index';
 import { argDefinitions, usageDefinitions } from './command-line-definitions';
-import { fileExists } from './exists';
 import { writeFile } from './write';
 dotenv.config();
 
 (async () => {
     let {
-        file,
+        files,
+        directory,
         help,
         database,
         clientId,
@@ -26,10 +27,11 @@ dotenv.config();
     clientId = clientId ?? process.env.BUGSPLAT_CLIENT_ID;
     clientSecret = clientSecret ?? process.env.BUGSPLAT_CLIENT_SECRET;
     
-    const exists = await fileExists(file)
-    
-    if (!exists) {
-        logMissingArgAndExit('file');
+    if (!files) {
+        logMissingArgAndExit('files');
+    }
+    if (!directory) {
+        logMissingArgAndExit('directory');
     }
     if (!database) {
         logMissingArgAndExit('database');
@@ -37,34 +39,49 @@ dotenv.config();
     if (!clientId || !clientSecret) {
         logMissingAuthAndExit();
     }
-
+    
     let returnCode = 0;
     
     try {
+        const globPattern = `${normalizeDirectory(directory)}/${files}`;
+        const binaryFilePaths = await glob(globPattern);
+
+        if (!binaryFilePaths.length) {
+            throw new Error(`Could not find any files to upload using glob ${globPattern}!`);
+        }
+
+        console.log(`Found files:\n ${binaryFilePaths.join('\n')}`);
+
         const host = process.env.BUGSPLAT_HOST || `https://${database}.bugsplat.com`;
         
         console.log(`Authenticating with BugSplat via ${host}...`);
         
         const client = await AndroidDumpSymsClient.create(database, clientId, clientSecret, host);
 
-        console.log(`About to upload ${file}...`);
+        for (const file of binaryFilePaths) {
+            const fileName = basename(file);
 
-        const response = await client.upload(file);
-        const status = response.status;
+            console.log(`Uploading ${fileName}...`);
+    
+            const response = await client.upload(file);
+    
+            if (response.status !== 200) {
+                console.error(`Could not convert file, status: ${response.status}`);
+                returnCode = 1;
+                continue;
+            }
 
-        if (status !== 200) {
-            throw new Error(`Could not convert file, status: ${status}`)
+            console.log(`Uploaded ${fileName} successfully!`);
+    
+            const outputFile = join(dirname(file), `${fileName}.sym`);
+            const outputFileName = basename(outputFile);
+    
+            console.log(`Downloading ${outputFileName}...`);
+            
+            await writeFile(outputFile, response.body as ReadableStream);
+    
+            console.log(`Successfully converted ${fileName} to ${outputFileName}`);
         }
-
-        const fileName = path.basename(file);
-        const outputDir = path.dirname(file);
-        const outputFile = path.join(outputDir, `${fileName}.sym`);
-
-        console.log(`Downloading ${basename(outputFile)}...`);
-        
-        await writeFile(outputFile, response.body as ReadableStream);
-
-        console.log(`Successfully converted ${basename(file)} to ${basename(outputFile)}`);
     } catch (error) {
         console.error(error);
         returnCode = 1;
@@ -72,7 +89,6 @@ dotenv.config();
 
     process.exit(returnCode);
 })();
-
 
 function logHelpAndExit() {
     const help = commandLineUsage(usageDefinitions);
@@ -88,4 +104,8 @@ function logMissingArgAndExit(arg: string): void {
 function logMissingAuthAndExit(): void {
     console.log('\nInvalid authentication arguments: please provide a clientId and clientSecret\n');
     process.exit(1);
+}
+
+function normalizeDirectory(directory: string): string {
+    return directory.replace(/\\/g, '/');
 }
