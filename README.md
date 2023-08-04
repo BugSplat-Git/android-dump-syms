@@ -32,24 +32,24 @@ bobby@BugSplat % ~ % android-dump-syms -h
 
 Usage
 
-  --file string               The file to convert                                                           
-  -h, --help                  Print this usage guide.                                                       
-  -b, --database string       The name of your BugSplat database associated with your Client ID and Client  
-                              Secret pair. This value can also be provided via the BUGSPLAT_DATABASE        
-                              environment variable.                                                         
-  -i, --clientId string       An OAuth2 Client Credentials Client ID for the specified database. This value 
-                              can also be provided via the BUGSPLAT_CLIENT_ID environment variable.         
-  -s, --clientSecret string   An OAuth2 Client Credentials Client Secret for the specified database. This   
-                              value can also be provided via the BUGSPLAT_CLIENT_SECRET environment         
-                              variable.                                                                     
+  -f, --files string (optional)       Glob pattern that specifies a set of android binary files to upload Defaults to '**/*.so'    
+
+  -d, --directory string (optional)   Path of the base directory used to search for symbol files. This value will be combined with the --files glob. Defaults to '.'
+
+  -h, --help                          Print this usage guide.   
+                                                      
+  -b, --database string               The name of your BugSplat database associated with your Client ID and Client Secret pair. This value can also be provided via the BUGSPLAT_DATABASE environment variable.                                                         
+
+  -i, --clientId string               An OAuth2 Client Credentials Client ID for the specified database. This value can also be provided via the BUGSPLAT_CLIENT_ID environment variable.
+
+  -s, --clientSecret string           An OAuth2 Client Credentials Client Secret for the specified database This value can also be provided via the BUGSPLAT_CLIENT_SECRET environment variable.                                                                     
 
   The -i and -s arguments are not required if you set the environment variables 
   BUGSPLAT_CLIENT_ID and BUGSPLAT_CLIENT_SECRET.                                
 
 Example
 
-  android-dump-syms path-to-binary-file -d your-bugsplat-database -i your-      
-  client-id -s your-client-secret                                               
+  android-dump-syms glob-for-android-binary-files -d your-bugsplat-database -i your-client-id -s your-client-secret                                          
 
 Links
 
@@ -57,10 +57,10 @@ Links
                                                        
   💻 https://github.com/BugSplat-Git/android-dump-syms 
                                                        
-  💌 support@bugsplat.com                              
+  💌 support@bugsplat.com                         
 ```
 
-3. Run android-dump-syms passing it the path to the Android binary file to use to generate a `.sym`.
+3. Run android-dump-syms passing it a path or glob pattern to locate Android binary files to convert to `.sym` files.
 
 ## API
 
