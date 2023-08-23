@@ -1,22 +1,19 @@
 import { ApiClient, BugSplatResponse, OAuthClientCredentialsClient } from "@bugsplat/js-api-client";
-import { readFile } from "fs/promises";
-import { basename } from "path";
+import { createStreamableFile } from 'node-streamable-file';
 
 export class AndroidDumpSymsClient {
-    readFile = readFile;
-
     private constructor(public authenticatedClient: ApiClient) { }
 
     async upload(path: string): Promise<BugSplatResponse> {
-        // TODO BG streaming implementation
-        const formData = this.authenticatedClient.createFormData();
-        const file = await this.readFile(path);
-        const blob = new Blob([file]);
-        formData.append('file', blob, basename(path));
+        const formData = new FormData();
+        const file = await createStreamableFile(path);
+        formData.append('file', file as unknown as Blob);
+
         return this.authenticatedClient.fetch('/post/android/symbols', {
             method: 'POST',
-            body: formData
-        });
+            body: formData,
+            duplex: 'half'
+        } as any);
     }
 
     static async create(database: string, clientId: string, clientSecret: string, host?: string | undefined): Promise<AndroidDumpSymsClient> {
