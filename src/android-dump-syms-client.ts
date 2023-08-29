@@ -1,5 +1,5 @@
 import { ApiClient, BugSplatResponse, OAuthClientCredentialsClient } from "@bugsplat/js-api-client";
-import { createStreamableFile } from 'node-streamable-file';
+import { createStreamableFile } from './create-streamable-file';
 
 export class AndroidDumpSymsClient {
     private constructor(public authenticatedClient: ApiClient) { }

@@ -53,10 +53,10 @@
   },
   "dependencies": {
     "@bugsplat/js-api-client": "^7.3.0",
+    "@web-std/file": "^3.0.3",
     "command-line-args": "^5.2.0",
     "command-line-usage": "^6.1.1",
     "dotenv": "^10.0.0",
-    "glob": "^10.3.3",
-    "node-streamable-file": "1.0.0"
+    "glob": "^10.3.3"
   }
 }
