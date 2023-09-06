@@ -21,13 +21,16 @@ export class AndroidDumpSymsClient {
         const formData = this.authenticatedClient.createFormData();
         formData.append('file', file as unknown as Blob, name);
 
-        const response = await this.authenticatedClient.fetch('/post/android/symbols', {
-            method: 'POST',
-            body: formData,
-            duplex: 'half'
-        } as unknown as RequestInit);
-
-        await handle.close();
+        let response: BugSplatResponse;
+        try {
+            response = await this.authenticatedClient.fetch('/post/android/symbols', {
+                method: 'POST',
+                body: formData,
+                duplex: 'half'
+            } as unknown as RequestInit);
+        } finally {
+            await handle.close();
+        }
 
         return response;
     }
