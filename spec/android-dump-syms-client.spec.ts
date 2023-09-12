@@ -7,8 +7,7 @@ describe('AndroidDumpSymsClient', () => {
     let fakeFormData;
     let result;
 
-    const fakeHandle = { close: jasmine.createSpy() };
-    const fakeFile = new File([], 'fakeFile');
+    const fakeBlob = new Blob([]);
     const fakePath = 'fakePath';
     const fakeResult = 'fakeResult;'
 
@@ -18,10 +17,8 @@ describe('AndroidDumpSymsClient', () => {
         fakeClient.createFormData.and.returnValue(fakeFormData);
         fakeClient.fetch.and.resolveTo(fakeResult);
         sut = new (AndroidDumpSymsClient as any)(fakeClient);
-        (sut as any).open = jasmine.createSpy();
-        (sut as any).createStreamableFile = jasmine.createSpy();
-        ((sut as any).open as jasmine.Spy).and.resolveTo(fakeHandle);
-        ((sut as any).createStreamableFile as jasmine.Spy).and.resolveTo(fakeFile);
+        (sut as any).blobFrom = jasmine.createSpy();
+        ((sut as any).blobFrom as jasmine.Spy).and.resolveTo(fakeBlob);
         result = await sut.upload(fakePath);
     });
 
@@ -30,20 +27,16 @@ describe('AndroidDumpSymsClient', () => {
             expect(fakeClient.fetch).toHaveBeenCalledWith('/post/android/symbols', jasmine.any(Object));
         });
 
-        it('should call createStreamableFile with name and handle', () => {
-            expect((sut as any).createStreamableFile).toHaveBeenCalledWith(fakePath, fakeHandle);
+        it('should call blobFrom with path', () => {
+            expect((sut as any).blobFrom).toHaveBeenCalledWith(fakePath);
         });
 
         it('should append file', () => {
-            expect(fakeFormData.append).toHaveBeenCalledWith('file', fakeFile, fakePath);
+            expect(fakeFormData.append).toHaveBeenCalledWith('file', fakeBlob, fakePath);
         });
 
         it('should return response', () => {
             expect(result).toBe(fakeResult);
-        });
-
-        it('should close file handle', () => {
-            expect(fakeHandle.close).toHaveBeenCalled();
         });
     });
 });

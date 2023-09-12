@@ -1,38 +1,22 @@
-import { ApiClient, BugSplatResponse, OAuthClientCredentialsClient } from "@bugsplat/js-api-client";
-import { File } from '@web-std/file';
-import { createStreamableFile } from 'node-streamable-file';
-import { open } from 'node:fs/promises';
-import { basename } from "node:path";
-
-// Polyfill File for pkg because it's not defined until Node.js 18.13
-globalThis.File = File;
+import { blobFrom } from '@bugsplat/fetch-blob/dist/from';
+import { ApiClient, BugSplatResponse, OAuthClientCredentialsClient } from '@bugsplat/js-api-client';
+import { basename } from 'node:path';
 
 export class AndroidDumpSymsClient {
-    private createStreamableFile = createStreamableFile;
-    private open = open;
+    private blobFrom = blobFrom
 
     private constructor(public authenticatedClient: ApiClient) { }
 
     async upload(path: string): Promise<BugSplatResponse> {
         const name = basename(path);
-        const handle = await this.open(path);
-        const file = await this.createStreamableFile(name, handle);
-        
         const formData = this.authenticatedClient.createFormData();
-        formData.append('file', file as unknown as Blob, name);
+        formData.append('file', await this.blobFrom(path), name);
 
-        let response: BugSplatResponse;
-        try {
-            response = await this.authenticatedClient.fetch('/post/android/symbols', {
-                method: 'POST',
-                body: formData,
-                duplex: 'half'
-            } as unknown as RequestInit);
-        } finally {
-            await handle.close();
-        }
-
-        return response;
+        return this.authenticatedClient.fetch('/post/android/symbols', {
+            method: 'POST',
+            body: formData,
+            duplex: 'half'
+        } as unknown as RequestInit);
     }
 
     static async create(database: string, clientId: string, clientSecret: string, host?: string | undefined): Promise<AndroidDumpSymsClient> {

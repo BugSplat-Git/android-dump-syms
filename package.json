@@ -11,6 +11,8 @@
   ],
   "scripts": {
     "start": "ts-node -r dotenv/config ./bin/index.ts **/*.so -d ./spec",
+    "prestart:pkg": "npm run build",
+    "start:pkg": "./pkg/android-dump-syms-macos **/*.so -d ./spec",
     "test": "ts-node node_modules/jasmine/bin/jasmine",
     "help": "ts-node ./bin/index.ts -h",
     "clean": "rimraf ./dist",
@@ -52,12 +54,12 @@
     "typescript": "^4.3.2"
   },
   "dependencies": {
+    "@bugsplat/fetch-blob": "^4.0.0",
     "@bugsplat/js-api-client": "^7.3.0",
-    "@web-std/file": "^3.0.3",
     "command-line-args": "^5.2.0",
     "command-line-usage": "^6.1.1",
+    "domexception": "^4.0.0",
     "dotenv": "^10.0.0",
-    "glob": "^10.3.3",
-    "node-streamable-file": "^2.0.0"
+    "glob": "^10.3.3"
   }
 }
