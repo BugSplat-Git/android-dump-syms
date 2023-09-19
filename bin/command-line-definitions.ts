@@ -9,7 +9,7 @@ export const argDefinitions: Array<CommandLineDefinition> = [
         alias: 'f',
         type: String,
         defaultOption: true,
-        defaultValue: '**/*.sym',
+        defaultValue: '**/*.so',
         typeLabel: '{underline string} (optional)',
         description: 'Glob pattern that specifies a set of android binary files to upload. Defaults to \'**/*.so\'',
     },
