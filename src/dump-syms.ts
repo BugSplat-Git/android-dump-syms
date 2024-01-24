@@ -4,6 +4,7 @@ import { platform } from 'node:os';
 import { promisify } from 'node:util';
 import { constants } from 'node:buffer';
 import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 const exec = promisify(child_process.exec);
 const maxBuffer = constants.MAX_LENGTH
 
@@ -30,7 +31,7 @@ export class DumpSyms {
             return platformSpecificFileName;
         }
 
-        const pathToDumpSyms = `./dist/bin/${platformSpecificFileName}`;
+        const pathToDumpSyms = join('.', 'dist', 'bin', platformSpecificFileName);
 
         if (!existsSync(pathToDumpSyms)) {
             throw new Error(`Could not find ${platformSpecificFileName}!`);
