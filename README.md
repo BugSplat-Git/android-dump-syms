@@ -18,7 +18,7 @@
 
 # android-dump-syms
 
-Leverage [globs](https://github.com/isaacs/node-glob) and Mozilla's dump_syms to create `.sym` files from Android/Linux binaries.
+Leverage [globs](https://github.com/isaacs/node-glob) and Mozilla's [dump_syms](https://github.com/mozilla/dump_syms) to create `.sym` files from Android/Linux binaries.
 
 ## Command Line
 
