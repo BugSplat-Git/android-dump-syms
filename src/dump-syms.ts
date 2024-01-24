@@ -1,10 +1,11 @@
 
-import child_process from 'node:child_process';
-import { platform } from 'node:os';
-import { promisify } from 'node:util';
 import { constants } from 'node:buffer';
+import child_process from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { platform } from 'node:os';
+import { dirname, join } from 'node:path';
+import { execPath } from 'node:process';
+import { promisify } from 'node:util';
 const exec = promisify(child_process.exec);
 const maxBuffer = constants.MAX_LENGTH
 
@@ -34,12 +35,18 @@ export class DumpSyms {
             return platformSpecificFileName;
         }
 
-        const pathToDumpSyms = join('.', 'dist', 'bin', platformSpecificFileName);
+        let pathToDumpSyms = join('.', 'dist', 'bin', platformSpecificFileName);
 
-        if (!existsSync(pathToDumpSyms)) {
-            throw new Error(`Could not find ${platformSpecificFileName}!`);
+        if (existsSync(pathToDumpSyms)) {
+            return pathToDumpSyms;
         }
 
-        return pathToDumpSyms;
+        pathToDumpSyms = join(dirname(execPath), platformSpecificFileName);
+
+        if (existsSync(pathToDumpSyms)) {
+            return pathToDumpSyms;
+        }
+
+        throw new Error(`Could not find dump-syms binary at ${pathToDumpSyms}!`);
     }
 }
