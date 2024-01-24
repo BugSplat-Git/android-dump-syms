@@ -12,10 +12,13 @@ export class DumpSyms {
     private pathToDumpSyms: string;
 
     constructor(pathToDumpSyms?: string) {
-        if (platform() === 'win32') {
-            this.pathToDumpSyms = pathToDumpSyms ?? this.findDumpSyms('dump_syms.exe');
+        const os = platform();
+        if (os === 'win32') {
+            this.pathToDumpSyms = pathToDumpSyms ?? this.findDumpSyms('dump-syms-win.exe');
+        } else if (os === 'darwin') {
+            this.pathToDumpSyms = pathToDumpSyms ?? this.findDumpSyms('dump-syms-mac');
         } else {
-            this.pathToDumpSyms = pathToDumpSyms ?? this.findDumpSyms('dump_syms');
+            this.pathToDumpSyms = pathToDumpSyms ?? this.findDumpSyms('dump-syms-linux');
         }
     }
 
