@@ -10,18 +10,21 @@
     "dist"
   ],
   "scripts": {
-    "start": "ts-node -r dotenv/config ./bin/index.ts **/*.so -d ./spec",
-    "prestart:pkg": "npm run build",
+    "start": "ts-node ./bin/index.ts **/*.so -d ./spec",
     "start:pkg": "./pkg/android-dump-syms-macos **/*.so -d ./spec",
-    "test": "ts-node node_modules/jasmine/bin/jasmine",
     "help": "ts-node ./bin/index.ts -h",
     "clean": "rimraf ./dist",
     "prebuild": "npm run clean",
-    "build": "tsc",
-    "prerelease": "npm run build",
-    "release": "npm publish --access public",
+    "copy:deps": "copyfiles -f ./deps/dump_syms/target/release/dump_syms ./deps/dump_syms/LICENSE-MIT ./dist/bin",
+    "build:deps": "npx mkdirp ./dist/bin && cargo build --release --manifest-path ./deps/dump_syms/Cargo.toml && npm run copy:deps",
+    "build:ts": "tsc",
+    "build": "npm run build:deps && npm run build:ts",
+    "prestart": "npm run build:deps",
+    "prestart:pkg": "npm run build",
     "prepkg": "npm run build",
-    "pkg": "npx pkg -C -o ./pkg/android-dump-syms -t node18-macos-x64,node18-linux-x64,node18-win-x64 ./dist/bin/index.js"
+    "pkg": "npx pkg -C -o ./pkg/android-dump-syms -t node18-macos-x64,node18-linux-x64,node18-win-x64 ./dist/bin/index.js",
+    "prerelease": "npm run build",
+    "release": "npm publish --access public"
   },
   "repository": {
     "type": "git",
@@ -47,19 +50,18 @@
     "@types/glob": "^8.1.0",
     "@types/jasmine": "^4.3.1",
     "@types/node": "^20.5.9",
+    "copyfiles": "^2.4.1",
     "jasmine": "^4.6.0",
+    "mkdirp": "^3.0.1",
     "pkg": "^5.8.1",
     "rimraf": "^5.0.0",
     "ts-node": "^10.2.1",
     "typescript": "^4.3.2"
   },
   "dependencies": {
-    "@bugsplat/fetch-blob": "^4.0.0",
-    "@bugsplat/js-api-client": "^7.3.0",
     "command-line-args": "^5.2.0",
     "command-line-usage": "^6.1.1",
     "domexception": "^4.0.0",
-    "dotenv": "^10.0.0",
     "glob": "^10.3.3"
   }
 }
