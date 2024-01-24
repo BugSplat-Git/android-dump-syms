@@ -15,7 +15,7 @@
     "help": "ts-node ./bin/index.ts -h",
     "clean": "rimraf ./dist",
     "prebuild": "npm run clean",
-    "copy:deps": "copyfiles -f ./deps/dump_syms/target/release/dump_syms ./deps/dump_syms/LICENSE-MIT ./dist/bin && ts-node ./scripts/rename.ts",
+    "copy:deps": "copyfiles -f ./deps/dump_syms/target/release/dump_syms ./deps/dump_syms/target/release/dump_syms.exe ./deps/dump_syms/LICENSE-MIT ./dist/bin && ts-node ./scripts/rename.ts",
     "build:deps": "npx mkdirp ./dist/bin && cargo build --release --manifest-path ./deps/dump_syms/Cargo.toml && npm run copy:deps",
     "build:ts": "tsc",
     "build": "npm run build:deps && npm run build:ts",
