@@ -1,7 +1,10 @@
 [![bugsplat-github-banner-basic-outline](https://user-images.githubusercontent.com/20464226/149019306-3186103c-5315-4dad-a499-4fd1df408475.png)](https://bugsplat.com)
 <br/>
-# <div align="center">BugSplat</div> 
+
+# <div align="center">BugSplat</div>
+
 ### **<div align="center">Crash and error reporting built for busy developers.</div>**
+
 <div align="center">
     <a href="https://twitter.com/BugSplatCo">
         <img alt="Follow @bugsplatco on Twitter" src="https://img.shields.io/twitter/follow/bugsplatco?label=Follow%20BugSplat&style=social">
@@ -15,7 +18,7 @@
 
 # android-dump-syms
 
-Leverage the BugSplat API to convert Android binaries to Crashpad compatible `.sym` files.
+Leverage [globs](https://github.com/isaacs/node-glob) and Mozilla's [dump_syms](https://github.com/mozilla/dump_syms) to create `.sym` files from Android/Linux binaries.
 
 ## Command Line
 
@@ -27,37 +30,28 @@ bobby@BugSplat % ~ % android-dump-syms -h
 
 @bugsplat/android-dump-syms
 
-  android-dump-syms contains a command line utility and a library to help you   
-  generate sym files from Android binaries via the BugSplat API.                
+  android-dump-syms contains a command line utility and a library to help you
+  generate sym files from Android binaries via the BugSplat API.
 
 Usage
 
-  -f, --files string (optional)       Glob pattern that specifies a set of android binary files to upload Defaults to '**/*.so'    
+  -f, --files string (optional)       Glob pattern that specifies a set of android binary files to upload Defaults to '**/*.so'
 
   -d, --directory string (optional)   Path of the base directory used to search for symbol files. This value will be combined with the --files glob. Defaults to '.'
 
-  -h, --help                          Print this usage guide.   
-                                                      
-  -b, --database string               The name of your BugSplat database associated with your Client ID and Client Secret pair. This value can also be provided via the BUGSPLAT_DATABASE environment variable.                                                         
-
-  -i, --clientId string               An OAuth2 Client Credentials Client ID for the specified database. This value can also be provided via the BUGSPLAT_CLIENT_ID environment variable.
-
-  -s, --clientSecret string           An OAuth2 Client Credentials Client Secret for the specified database This value can also be provided via the BUGSPLAT_CLIENT_SECRET environment variable.                                                                     
-
-  The -i and -s arguments are not required if you set the environment variables 
-  BUGSPLAT_CLIENT_ID and BUGSPLAT_CLIENT_SECRET.                                
+  -h, --help                          Print this usage guide.
 
 Example
 
-  android-dump-syms glob-for-android-binary-files -d your-bugsplat-database -i your-client-id -s your-client-secret                                          
+  android-dump-syms glob-for-android-binary-files -d directory-to-search
 
 Links
 
-  🐛 https://bugsplat.com                              
-                                                       
-  💻 https://github.com/BugSplat-Git/android-dump-syms 
-                                                       
-  💌 support@bugsplat.com                         
+  🐛 https://bugsplat.com
+
+  💻 https://github.com/BugSplat-Git/android-dump-syms
+
+  💌 support@bugsplat.com
 ```
 
 3. Run android-dump-syms passing it a path or glob pattern to locate Android binary files to convert to `.sym` files.
@@ -65,38 +59,22 @@ Links
 ## API
 
 1. Install this package locally `npm i @bugsplat/android-dump-syms`.
-2. Import `AndroidDumpSymsClient` from @bugsplat/android-dump-syms.
+2. Import `DumpSyms` from @bugsplat/android-dump-syms.
 
 ```ts
-import { AndroidDumpSymsClient } from '@bugsplat/android-dump-syms';
+import { DumpSyms } from "@bugsplat/android-dump-syms";
 ```
 
-3. Create a new instance of `AndroidDumpSymsClient` using the `create` async factory function.
+3. Create a new instance of `DumpSyms`.
 
 ```ts
-const client = await AndroidDumpSymsClient.create(database, clientId, clientSecret);
+const dumpSyms = new DumpSyms();
 ```
 
-4. Call `upload`, passing the function a path to an Android `.so` file.
+4. Call `run`, passing the function a path to an Android `.so` file, and optionally an output file path.
 
 ```ts
-const response = await client.upload('path/to/file.so');
-```
-
-5. The `.sym` file can be streamed via the `body` property on the `response` object and written to a file.
-
-```ts
-import { BugSplatResponse } from '@bugsplat/android-dump-syms';
-import { createWriteStream } from 'fs';
-import * as streamWeb from 'node:stream/web';
-import { Readable } from 'stream';
-import { finished } from 'stream/promises';
-
-export async function writeFile(path: string, response: BugSplatResponse): Promise<void> {
-    const readable = response.body as streamWeb.ReadableStream<any>;
-    const fileStream = createWriteStream(path, { flags: 'wx' });
-    await finished(Readable.fromWeb(readable).pipe(fileStream));
-}
+const { stderr } = await dumpSyms.run(inputPath, outputPath);
 ```
 
 If you've done everything correctly the resulting file will resemble the following:
