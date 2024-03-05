@@ -24,7 +24,7 @@ export class DumpSyms {
     }
 
     async run(inputPath: string, outputPath?: string): Promise<{ stdout: string, stderr: string }> {
-        const command = `${this.pathToDumpSyms} ${inputPath}` + (outputPath ? ` > ${outputPath}` : '');
+        const command = `"${this.pathToDumpSyms}" "${inputPath}"` + (outputPath ? ` > "${outputPath}"` : '');
         return exec(command, {
             maxBuffer
         });
